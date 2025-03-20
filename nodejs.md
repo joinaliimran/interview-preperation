@@ -211,7 +211,32 @@ Handle Errors in Node JS
     3. Using Promises
     4. Using Async/ Await and Try/Catch
 
+How does Node.js handle child threads?
+Node.js has introduced the concept of Worker Threads and Child Processes to help with parallel processing.
+
+Worker Threads
+Node.js is capable of handling I/O operations efficiently. However, when it runs into any compute-heavy operation, it causes the primary event loop to freeze up.
+
+![SSR](./images/event-loop-freeze.png)
+
+When Node.js discovers an async operation, it ״offshores״ it to the thread pool. However, when it needs to run a compute-heavy operation, it performs it on its primary thread, which causes the app to block until the operation has finished.
+
+It does this by spinning up an isolated Node.js context that contains its own Node.js runtime, event loop, and event queue, which runs in a remote V8 environment. This executes in a disconnected environment from the primary event loop, allowing the primary event loop to free up.
+
+Child Processes
+Child processes are different from worker threads. While worker threads provide an isolated event loop and V8 runtime in the same process, child processes are separate instances of the entire Node.js runtime. Each child process has its own memory space and communicates with the main process through IPC (inter-process communication) techniques like message streaming or piping (or files, Database, TCP/UDP, etc.).
+
+When should you use Worker Threads and Child Processess in Node.js?
+
+Use worker threads when:
+You're running CPU-intensive tasks. If your tasks are CPU-intensive, worker threads are a good choice.
+Your tasks require shared memory and efficient communication between threads. Worker threads have built-in support for shared memory and a messaging system for communication.
+
+Use child processes when:
+You're running tasks that need to be isolated and run independently, especially if they involve external programs or scripts. Each child process runs in its own memory space. If the child process crashes for some reason, it will not crash your main process along with it.
+
 Difference between Async and Worker threads?
+
 Async is used for time consuming tasks like API calling while worker threads are used for high computational tasks which require processing power like data processing.
 
 What are clusters in Node JS?  
@@ -334,3 +359,272 @@ A DDoS (Distributed Denial-of-Service) attack is a malicious attempt to disrupt 
 What is Refresh Token?
 When a JWT is initially generated, a Refresh Token is also created and sent to the client. The client securely stores the JWT and Refresh Token—ideally, the Refresh Token in an HttpOnly cookie to protect against XSS attacks. For each subsequent request, the client includes the JWT in the request header (typically as a Bearer token) for authentication.
 If the JWT expires, the client sends the Refresh Token in a secure request (such as via an HttpOnly cookie) to the server to request a new JWT. The Refresh Token typically has a longer expiration period compared to the JWT
+
+What are buffers and streams in Node JS?
+Buffer contains small chunks of data that are stored temporarily and can be transferred from one place to another.
+![Buffer](./images/buffer.png)
+
+However, stream contains chunks of buffered data that can be transferred from one place to another.
+![Buffer](./images/stream.png)
+
+Types of Streams in Node JS?
+There are four types of streams in Node JS:
+
+1. Readable Stream
+   Readable Stream is used to read data from a source in the form of chunks.
+
+```js
+const readableStream = fs.createReadStream("example.txt", "utf8");
+
+readableStream.on("data", (chunk) => {
+  console.log("Received chunk:", chunk);
+});
+```
+
+2. Writable Stream
+   Write data to a destination in the form of chunks
+
+```js
+const writableStream = fs.createWriteStream("output.txt");
+writableStream.write("Hello, world!\n");
+```
+
+3. Duplex Stream
+   Acts as both Readable and Writable.
+
+4. Transform Stream
+   A special type of Duplex stream that modifies data while reading and writing.
+
+Why Use Streams?
+Efficient memory usage (no need to load entire files into memory).
+Faster processing (handles chunks of data as they arrive).
+Used in handling files, network communication, and real-time processing.
+
+How would you define the term Non Blocking I/O?
+Node.js uses an event-driven, non-blocking I/O model, meaning it can handle multiple I/O operations concurrently without waiting for each one to complete.
+
+What does event-driven programming mean?
+Event-driven architecture (EDA) is a way of designing software where different parts of a system communicate by sending and responding to events. Imagine you are waiting for a guest at home. Instead of constantly checking the door, you wait for the doorbell (event) to ring.
+
+Parts of the event-driven programming:
+Event Producer: Something happens (e.g., a user clicks a button, a payment is made).
+Event Broker: A middle layer that helps send the event to the right place.
+Event Consumer: A system or service that listens for the event and reacts (e.g., sending an email confirmation after payment).
+
+What is an Event Loop in Node.js?
+Event Loop ensures asynchronous code runs without blocking execution.
+The Event Loop acts as a bridge between the Call Stack and the Callback Queue. It constantly checks:
+Is the Call Stack empty?
+If yes, it takes data from the relevant queue and pushes it to the Call Stack.
+
+Also Event Loop runs in multiple phases.
+
+1. Timers Phase (setTimeout, setInterval)
+2. Callbacks Phase
+3. Idle/Prepare Phase (Used for internal operations)
+4. Pool Phase (Retrieves new I/O operations)
+5. Check Phase (setImmediate)
+6. Close Callbacks Phase
+
+![Buffer](./images/queues-flow.png)
+
+Example For Event Loop
+Imagine a restaurant with a waiter (event loop), customers (tasks), and a kitchen (processing unit).
+
+A customer (task) arrives and places an order (request).
+The waiter (event loop) takes the order and gives it to the kitchen (processor).
+Instead of waiting for the kitchen to finish cooking, the waiter takes another order from a different customer.
+When the kitchen is done with an order, it notifies the waiter.
+The waiter then serves the completed order to the respective customer.
+
+How many Queues are present in the NodeJS?
+The main types of queues are:
+
+1. Macrotask Queue (Task Queue)
+   Contains tasks that come from:
+   setTimeout
+   setInterval
+   setImmediate (Node.js)
+   I/O operations (e.g., file reading, network requests)
+   UI rendering tasks (in browsers)
+   MessageChannel
+
+2. Microtask Queue (Job Queue)
+   Contains higher-priority tasks executed before the next macrotask.
+   Includes:
+   Promises (.then, catch, finally)
+
+3. Render Queue (Browser-specific)
+   Handles rendering tasks like UI updates in web browsers.
+   Runs between different macrotask executions.
+
+Differentiate between process.nextTick() and setImmediate()?
+In Node.js, process.nextTick() and setImmediate() are both used to schedule callbacks, but they execute at different phases of the event loop.
+
+process.nextTick()
+The process.nextTick() method is used to schedule a callback to be executed before the event loop moves to the next phase.
+
+setImmediate()
+Executes callbacks in the check phase of the event loop, after I/O operations.
+
+```javascript
+console.log("Start");
+
+process.nextTick(() => {
+  console.log("process.nextTick callback 1");
+  process.nextTick(() => {
+    console.log("process.nextTick callback 2");
+  });
+});
+
+setImmediate(() => {
+  console.log("setImmediate callback");
+});
+
+console.log("End");
+```
+
+```
+Output:
+Start
+End
+process.nextTick callback 1
+process.nextTick callback 2
+setImmediate callback
+```
+
+What is Libuv?
+libuv is the underlying C library that Node.js uses to implement the event loop.
+libuv does not executes tasks directly it manages asynchronous tasks (like timers, I/O, and network requests) and places their callbacks in the event queues when they are ready.
+
+What is REPL in Node.js?
+REPL stands for Read-Eval-Print Loop in Node.js. It is an interactive environment that allows you to execute JavaScript code directly in a command-line interface.
+To start the REPL, simply open a terminal and run: node
+
+Read – Reads user input.
+Eval – Evaluates the input JavaScript code.
+Print – Prints the result of the evaluation.
+Loop – Loops back to read the next input.
+
+What is piping in Node.js?
+Piping is a mechanism in Node.js that allows data to be passed from one stream to another. It is commonly used to read data from a readable stream and send it to a writable stream.
+
+```javascript
+const fs = require("fs");
+
+const readableStream = fs.createReadStream("input.txt");
+const writableStream = fs.createWriteStream("output.txt");
+
+readableStream.pipe(writableStream);
+
+console.log("File copied successfully!");
+```
+
+What is callback hell (pyramid of doom)?
+Callback Hell occurs in JavaScript (especially in Node.js) when multiple nested asynchronous callbacks make code unreadable and difficult to maintain.
+
+Example:
+
+```javascript
+fs.readFile("file1.txt", "utf8", (err, data1) => {
+  if (err) return console.error(err);
+
+  fs.readFile("file2.txt", "utf8", (err, data2) => {
+    if (err) return console.error(err);
+
+    fs.readFile("file3.txt", "utf8", (err, data3) => {
+      if (err) return console.error(err);
+
+      console.log("All files read successfully!");
+    });
+  });
+});
+```
+
+Solution is to use promises .then() or async and await
+
+What is typically the first argument passed to a Node.js callback handler?
+In Node.js, the first argument passed to a callback function is typically an error object (commonly named err).
+
+```javascript
+const fs = require("fs");
+
+fs.writeFile("example.txt", "Hello, Node.js!", (err) => {
+  if (err) {
+    console.error("Error writing to file:", err);
+    return;
+  }
+  console.log("File written successfully!");
+});
+```
+
+How do you handle file uploads in Node.js?
+To handle file uploads in Node.js, you typically use Express.js with a middleware like multer for processing multipart/form-data (used in file uploads).
+
+What is a first-class function in Javascript?
+A first-class function in JavaScript means that functions are treated like any other value. They can be:
+
+1. Assigned to variables
+2. Passed as arguments to other functions
+3. Returned from other functions
+
+```javascript
+// Assigning an arrow function to a variable
+const greet = (name) => `Hello, ${name}!`;
+
+// Passing a function as an argument
+const executeFunction = (callback) => console.log(callback("Alice"));
+
+// Returning a function from another function
+const outer = () => (name) => `Goodbye, ${name}!`;
+
+// Using all cases together
+const inner = outer(); // inner is now a function
+executeFunction(greet); // Calls greet function
+console.log(inner("Bob")); // Calls the returned function
+```
+
+```
+Hello, Alice!
+Goodbye, Bob!
+```
+
+What is an EventEmitter in Node.js?
+Many things in Node.js are event-driven. Events are like signals, and the EventEmitter module
+is used to create, listen to, and trigger custom events.
+
+```javascript
+const EventEmitter = require("events");
+const eventEmitter = new EventEmitter();
+
+const printName = (name) => {
+  console.log(`Hello, ${name}!`);
+};
+
+eventEmitter.on("greet", printName);
+eventEmitter.emit("greet", "Alice");
+eventEmitter.off("greet", printName);
+```
+
+How do you debug a Node.js application?
+Video Tutorial in Hindi
+https://www.youtube.com/watch?v=ioOWMmF3wMo
+
+To Check in VS Code
+
+1. Create a launch.json file and select Node.js
+2. Change Configuration
+3. Add Breakpoint
+4. Click on Run and Debug
+
+To Check in Chrome
+
+1. Run the index.js file with node inspect index.js command
+2. Open chrome and hit the chrome://inspect url
+3. Click the inspect link
+
+Can you access DOM in Node.js?
+No, Node.js cannot access the DOM (Document Object Model).
+
+1. Node.js runs on the server – It does not have a built-in browser environment.
+2. The DOM is a browser feature – It is part of the web APIs provided by the browser (like window, document).

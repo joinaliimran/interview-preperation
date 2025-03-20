@@ -1,13 +1,3 @@
-Here’s a list of commonly asked interview questions that are frequently encountered in backend development interviews, particularly with a focus on Node.js, Express.js, Nest.js, and GraphQL:
-
-What are the differences between process.nextTick() and setImmediate()?
-
-What are streams in Node.js?
-
-Explain the types of streams (Readable, Writable, Duplex, Transform) and how they work.
-How do you handle errors in Node.js?
-
-What are the best practices for error handling in asynchronous operations, and what are unhandled rejections?
 What is the purpose of require() in Node.js, and how does it differ from ES6 import?
 
 Can you explain how module resolution works in Node.js?
