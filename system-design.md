@@ -1,0 +1,13 @@
+EC2 EC2 stands for Elastic Compute 2 which is a kind of server where we deploy our application code.
+
+If the load increases on the server will you increase the servers by Auto Scaling Group Policy (ASGP) (Horizontal
+Scaling) or will you do anything else?
+
+We can identify critical and non-critical tasks and seggregate them. The critical tasks will be handled by the server
+like Payment tasks, but not critical tasks (sending email for successful payment) can be send to a queue and we can set
+up a consumer on a queue which is a seperate server.
+
+Always identify critical and non-critical tasks. For critical tasks they need to be done synchronously (can be handled
+by the server) and non-critical can be done asynchronously (can be handled by the queue).
+
+![Whatsapp Architecture](./images/whatapp-architecture.png)
