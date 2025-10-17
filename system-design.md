@@ -96,10 +96,12 @@ Cons of using Lambda
 2. You are bind in the AWS ecosystem
 3. They are stateless (No data can be stored on the server as they destroy after sometime)
 
-Difference between Virtualization and Containerization? In Virtualization, we run a virtual machine inside another
-machine. Like a OS running inside another OS.
+Difference between Virtualization and Containerization?
+
+In Virtualization, we run a virtual machine inside another machine. Like a OS running inside another OS.
 
 In Containerization, it is also a virtual machine but really lightweight.
 
-Container Orchestration (Kubernetes) It resolves multiple problems like management of multiple containers on different
-servers, auto-deployment and scaling.
+Container Orchestration (Kubernetes)
+
+It resolves multiple problems like management of multiple containers on different servers, auto-deployment and scaling.
