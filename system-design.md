@@ -76,3 +76,30 @@ inside the CDN for that region and when a new request is made it is fetched from
 Balancer and then the main server.
 
 ![System Design 1](./images/system-design-1.png)
+
+Can we use the same architecture for every product?
+
+No, we cannot use the same architecture for every product. Each product has different needs and features, so they
+require different designs. For example, YouTube and Netflix have different architectures because they serve different
+purposes and handle data in their own ways.
+
+Serverless (The cloud manage the architecture)
+
+Serverless means you don't have to set up or look after servers yourself. For example, in AWS, a service called Lambda
+runs your code for you. If more people use your app, AWS will automatically run more copies of your code. When fewer
+people use it, AWS stops the extra copies. You just write code, and AWS takes care of the CPU, RAM, auto scaling in the
+background. You just give the code to AWS and AWS will handle it by itself.
+
+Cons of using Lambda
+
+1. Cold Start (Lambda takes time to start)
+2. You are bind in the AWS ecosystem
+3. They are stateless (No data can be stored on the server as they destroy after sometime)
+
+Difference between Virtualization and Containerization? In Virtualization, we run a virtual machine inside another
+machine. Like a OS running inside another OS.
+
+In Containerization, it is also a virtual machine but really lightweight.
+
+Container Orchestration (Kubernetes) It resolves multiple problems like management of multiple containers on different
+servers, auto-deployment and scaling.
