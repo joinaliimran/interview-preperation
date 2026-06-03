@@ -1,19 +1,21 @@
 `What is useMemo?`
 
 useMemo is used to increase the performance of a React application by memoizing (caching) the result of an expensive
-computation. Basically, when the component is re-rendered when a component re-renders, all the functions and variables
-inside it are re-created. So, to eliminate the re-computation of the function we use useMemo. useMemo basically caches
-the value and returns the same value every time and when some change happens in the dependency array it is called and
-returns a new value based on the computation. We cannot use useMemo everytime because it uses memory space for caching
-the value and also we can face some performance issues. Only use if the computation is very expensive.
+computation. Basically, when the component is rerendered, all the functions and variables inside it are recreated. So,
+to eliminate the recomputation of the function we use useMemo. useMemo basically caches the value and returns the same
+value every time, only when some change happens in the dependency array the function gets called. It then returns a new
+value based on the computation. We cannot use useMemo everytime because it uses memory space for caching the value and
+also we can face some performance issues.
 
 useMemo is also used for referential equality problems. Because arrays, objects, and function references are again
-created when the component is re-rendered and if their value is declared in a useEffect dependency array then the
-useEffect function will be called whenever the component is re-rendered.
+created when the component is rerendered and if their value is declared in a useEffect dependency array then the
+useEffect function will be called whenever the component is rerendered.
 
 Example
 
 ```js
+import React, { useMemo, useState } from "react"
+
 function ExpensiveComponent({ number }) {
   const factorial = (n) => {
     console.log("Calculating Factorial...")
@@ -28,6 +30,18 @@ function ExpensiveComponent({ number }) {
     </div>
   )
 }
+
+const ComponentTesting = () => {
+  const [number, setNumber] = useState(0)
+  return (
+    <>
+      <button onClick={() => setNumber(1)}>Set Number</button>
+      <ExpensiveComponent number={2} />
+    </>
+  )
+}
+
+export default ComponentTesting
 ```
 
 ```js
@@ -43,12 +57,9 @@ This obj now can be used in a useEffect function
 useCallback is very similar to useMemo. Because it is also used for performance optimization. The only main difference
 is that useMemo returns a value that is returned from the callback function and useCallback returns the callback
 function that is declared inside it. useCallback memoizes the whole function. Normally, when a React component
-re-renders, any function declared inside it gets re-created in memory. This can cause unnecessary re-renders in child
-components if that function is passed as a prop. useCallback prevents this by returning the same function reference
-unless its dependencies change.
-
-If we do not pass anything in the dependency array of useCallback and call that callback function then useCallback will
-freeze that function. And consoling anything will give the previous result.
+rerenders, any function declare inside it gets recreated. This can cause unnecessary rerenders in child components if
+that function is passed as a prop. useCallback prevents this by returning the same function reference unless its
+dependencies change.
 
 Example
 
@@ -59,10 +70,10 @@ const returnedFunction = useCallback(()=>{some operation},
 
 `What is Pure Component?`
 
-Pure Component is used for performance optimization and it is used to limit the re-rendering of the component. If the
-new state is the same as the previous state and if the setState is called the component does not re-render. It is used
-in class-based components. A Pure Component automatically implements shouldComponentUpdate(), which performs a shallow
-comparison of state and props.
+Pure Component is used for performance optimization and it is used to limit the rerendering of the component. A Pure
+Component automatically implements shouldComponentUpdate(), which performs a shallow comparison of state and props. If
+the parent component rerenders and the props passing to it are not changed the component will not rerender also if the
+setState is called and the new state is same as previous it will also not called. It is used in class-based components.
 
 Example
 
@@ -77,7 +88,7 @@ If there is no dependency array then the useEffect will be called everytime when
 `What is props drilling?`
 
 Props drilling is passing the data through several nested components. Like the data is passing from grandparent to
-parent and parent to child component. The problem with this approach is that the components that lie in between are only
+parent and parent to child component. The problem with this approach is that the components that lie inbetween are only
 used as a medium to pass the data and they don’t actually need the data. To escape from this approach we can use
 useContext and Redux.
 
@@ -128,8 +139,9 @@ It contains all steps from the beginning of software and to the end of it.
 
 `What is Hoisting?`
 
-JavaScript Hoisting refers to the process where the _interpreter_ appears to move the declaration of variables,
-functions and classes to the top of the scope in which they are defined, before the execution of the code.
+In hoisting the _interpreter_ moves the declaration of variables and functions to the top of the scope in which they are
+defined, before the execution of the code. Also functions are hoisted completely. The whole definition/ declaration goes
+to the top of the scope.
 
 Example
 
@@ -143,8 +155,8 @@ There's a difference in how var, let, and const behave:
 
 var is hoisted and initialized with undefined, so you can use it before the actual declaration.
 
-let and const are hoisted but not initialized, so if you try to use them before they are declared, you'll get a
-ReferenceError. This period where they exist but can't be used is called the _Temporal Dead Zone_ (TDZ).
+let and const are hoisted but not initialized with undefined, so if you try to use them before they are declared, you'll
+get a ReferenceError. This period where they exist but can't be used is called the _Temporal Dead Zone_ (TDZ).
 
 Example
 
@@ -155,11 +167,21 @@ console.log(y) // Reference Error! (y is in the TDZ)
 let y = 20
 ```
 
-Also, if you don't declare a variable and try to use it:
+`Function Definition/ Declaration`
 
-In non-strict mode, JavaScript automatically creates it as a global var.
+```js
+function square(num) {
+  return num * num
+}
+```
 
-In strict mode ("use strict"), it throws an error instead.
+`Function Expression` A function is created and assinged to a variable.
+
+```js
+const square = function (num) {
+  return num * num
+}
+```
 
 `Difference between Var, Const and Let?`
 
@@ -179,10 +201,17 @@ var myVariable = 2
 
 Const and Let
 
-const and let are block scoped. They cannot be redeclared as in the same scope. In const you cannot re-initialize the
-same variable.
+const and let are block scoped. They cannot be redeclared in the same scope. In const you cannot reinitialize the same
+variable.
+
+`Difference between Mutable and Immutable values?`
+
+Mutable values are those which can be modified after creation. Immutable values are those which cannot be modified after
+creation.
 
 `Difference between Primitive and Non-Primitive Data-Types?`
+
+There are two data types in JS.
 
 Primitive Data-Types
 
@@ -195,9 +224,8 @@ values are objects.
 
 Also, the fundamental difference between Primitive and Non-Primitive values is that Primitive values are Immutable and
 Non-Primitive values are Mutable. Primitive values are stored by value while Non-Primitive values (objects) are stored
-by reference. It is important to note here that the variable in which the Primitive value is stored can still be
-reassigned to a new value but the existing value can not be changed. A primitive value can be replaced, but it can't be
-directly modified.
+by reference. It is important to note here that the Primitive values are reassinged to a new value and the existing
+value is replaced not changed.
 
 Example
 
@@ -205,14 +233,15 @@ Example
 let str = "Hello"
 str[0] = "Y"
 console.log(str) // ❌ Still "Hello" (does NOT change)
+
+// But this will work
+
+let str = "Hello".split("")
+str[0] = "Y"
+console.log(str)
 ```
 
-`Difference between Mutable and Immutable values?`
-
-Mutable values are those which can be modified after creation. Immutable values are those which cannot be modified after
-creation.
-
-What is This?
+`What is This?`
 
 This refers to the object that is calling the _current function_. If it is declared inside a method of an object then it
 points towards the object in which it is declared.
@@ -236,7 +265,7 @@ Incase of arrow functions
 const person = {
   name: "Alice",
   greet: () => {
-    console.log(this.name) // ❌ "this" does NOT refer to "person"
+    console.log(this.name) // ❌ "this" does NOT refer to "person" object
   }
 }
 person.greet() // Output: undefined (or window in browsers)
@@ -246,23 +275,61 @@ And if it is not declared inside an object then it points towards the global win
 
 `What is HOC`?
 
-A Higher Order Component is a function which takes input a component and returns a new modified component. HOC is used
-for code reusability such that you don’t have to write the same exact code for multiple components and you put the
+A Higher Order Component is a function which takes a component as an input and returns a new modified component. HOC is
+used for code reusability such that you don’t have to write the same exact code for multiple components and you put the
 repeated logic in HOC and main logic in the component which is given as input to HOC.
 
 Example
 
-https://www.youtube.com/watch?v=Fbrsn97jPmo
+```js
+import React from "react"
 
-Some Common Examples WithRouter Connect
+// 1. HOC function
+function withGreeting(WrappedComponent) {
+  return (props) => (
+    <div>
+      <p>Hello! 👋</p>
+      <WrappedComponent {...props} />
+    </div>
+  )
+}
+
+// 2. Simple component
+const Message = ({ text }) => <p>{text}</p>
+
+// 3. Wrap the component with HOC
+const MessageWithGreeting = withGreeting(Message)
+
+// 4. Usage
+export default function App() {
+  return <MessageWithGreeting text="This is a message." />
+}
+```
+
+Some Common Examples WithRouter, withTheme.
 
 `Difference between IndexOf and findIndex?`
 
-IndexOf expects a value as the first parameter. This makes it a good choice to find the index in arrays of primitive
-types (like string, number, or boolean).
+IndexOf expects a value as the first parameter and returns the index of a value. This makes it a good choice to find the
+index in arrays of primitive types (like string, number, or boolean).
 
 findIndex expects a callback as the first parameter. Use this if you need the index in arrays with non-primitive types
 (e.g. objects) or your find condition is more complex than just a value.
+
+```js
+const arr = [1, 2, 3, 4, 5]
+const arrOfObjects = [
+  { id: 1, name: "John" },
+  { id: 2, name: "Jane" },
+  { id: 3, name: "Jim" }
+]
+
+const indexFound = arr.indexOf(2)
+
+const objectFound = arrOfObjects.findIndex((obj) => obj.id === 2)
+console.log("indexFound= ", indexFound)
+console.log("objectFound= ", objectFound)
+```
 
 `What are Callbacks, Promises, and Async/Await?`
 
@@ -387,8 +454,8 @@ A Promise has four states:
 
 Promise.all
 
-Promise.all takes an array of Promises and in return, it gives another array of resolved Promises which is enwrapped
-with a new single Promise. Where it will only succeed if and only if all the Promises get resolved.
+Promise.all takes an array of Promises and in return, it gives another array of resolved Promises which it will run in
+parallel. Where it will only succeed if and only if all the Promises gets resolved.
 
 ```js
 Promise.all([firstFunction(), secondFunction(), thirdFunction()])
@@ -403,29 +470,29 @@ Promise.all([firstFunction(), secondFunction(), thirdFunction()])
 Promise.all Polyfill
 
 ```js
-Promise.allPolyFill = (promises) => {
-  let fulfilledPromises = [],
-    result = []
+Pconst promiseAllPolyfill = (promises) => {
+  let results = [];
+  let fulfilledCount = 0;
 
   return new Promise((resolve, reject) => {
-    promises.forEach((promise, index) =>
+    promises.forEach((promise, index) => {
       promise
-        .then((val) => {
-          fulfilledPromises.push(true)
-          result[index] = val
+        .then((response) => {
+          results[index] = response;
+          fulfilledCount += 1;
 
-          if (fulfilledPromises.length === promises.length) {
-            return resolve(result)
+          if (fulfilledCount === promises.length) {
+            resolve(results);
           }
         })
-        .catch((error) => {
-          return reject(error)
-        })
-    )
-  })
-}
+        .catch(() => {
+          reject(new Error("One of the promises rejected"));
+        });
+    });
+  });
+};
 
-Promise.allPolyFill([firstFunction(), secondFunction()])
+Promise.promiseAllPolyfill([firstFunction(), secondFunction()])
 ```
 
 Promise.race
@@ -453,7 +520,7 @@ response = [
 
 async/await are also used to handle asynchronous code introduced in ES8. They are simple and easy to write as they
 eliminate the chaining of then, catch, and finally block. Async/ await uses promises for asynchronous calls, but they
-give a new way to handle promises.
+give a new way to unwrap promises.
 
 Example
 
@@ -473,7 +540,7 @@ Question 1
 console.log("start")
 
 const p = new Promise((resolve, reject) => {
-  console.log(1)
+  console.log(1) // this is a js sync code part
   resolve(2) // asynchronous operation
 })
 
@@ -514,14 +581,16 @@ secondPromise
 JS is a single-threaded, non-blocking, asynchronous language. Asynchronous methods are needed because without them the
 browsers can not do anything as they cannot render anything.
 
-In browsers, we have web APIs for threading purposes for async requests and in nodejs, we have C++ threads.
+In browsers, we have **_web APIs_** for threading purposes for async requests and in NodeJS, we have **_C++ threads/
+libuv's worker threads_**.
 
 There are 4 components that are used while processing the code by compiler.
 
 1. CallStack
 2. Web Api's/ Node Api's
 3. Callback Queue
-4. Event Loop
+4. Render Queue
+5. Event Loop
 
 Where CallStack is a data structure having the Last In First Out principle, which handles all the synchronous code. Like
 our code is wrapped in the main function. So, the main function gets added to the CallStack for the very first time.
@@ -546,9 +615,7 @@ The job of Event Loop is to check either Callback Queue and CallStack is empty o
 is items in Callback Queue. Then it throws the items to the CallStack. It is important to note that anything in the
 Callback Queue will only run after the execution of the main program.
 
-![Buffer](./images/multi-threading-2.png)
-
-There is another queue which is the render queue and it is given the higher priority. Whenever the CallStack gets empty
+There is another queue which is the Render Queue and it is given the higher priority. Whenever the CallStack gets empty
 the render queue gets called first and it paints the browser with the data.
 
 Reference Link
@@ -559,7 +626,7 @@ https://www.youtube.com/watch?v=FVZ-A_Akros
 
 Implicit binding occurs when a function is called as a method of an object. In this case, this refers to the object.
 
-In explicit binding, we manually set the value of this using call, apply, or bind.
+In explicit binding, we explicitly set the value of this using call, apply, or bind.
 
 `What is Call, Apply and Bind (explicit binding)`
 
@@ -572,8 +639,8 @@ the additional parameters.
 
 `Apply`
 
-Apply is also similar to the call method. The only difference is that it takes all the additional parameters in an
-array.
+Apply is also similar to the call method. The only difference is that it takes all the additional parameters in the form
+of an array.
 
 `Bind`
 
@@ -625,7 +692,7 @@ Question 3
 ```js
 function checkPassword(ok, fail) {
   let password = prompt("Password?", "")
-  if (password == "Roadside Coder") ok()
+  if (password == "Pa$$w0rd!") ok()
   else fail()
 }
 
@@ -673,19 +740,17 @@ greetPerson("Bob") // Output: Hello, Bob!
 A closure is a combination of a function bundled together such that the variable defined outside of the inner function
 can be accessible inside of the inner function. Where the inner function has access to the scope (lexical scope) of the
 outer function. Even though, the outer function has done its execution long ago. Because the outer function saves its
-scope items for later use. There are three types of scopes in closures local scope, outer scope, and global scope. So,
-the inner function will have access to the outer function and the parent environment that is calling it this is called
-scope chaining.
+scope items for later use. There are three types of scopes in closures local scope, outer scope, and global scope.
 
 Example
 
 ```js
 const outerFunction = (outer) => {
   console.log("outer= ", outer)
-  return (innerFunction = (inner) => {
+  return (inner) => {
     console.log("outer= ", outer)
     console.log("inner= ", inner)
-  })
+  }
 }
 
 outerFunction("I am the outer value.")("I am the inner value")
@@ -726,7 +791,7 @@ let count = 0;
     console.log("count= ", count) // 1
   }
   console.log("count= ", count) // 0
-})() // IIFE
+})() // IIFE (Immediate Invoked Function Expression)
 ```
 
 Example
@@ -735,14 +800,14 @@ Example
 // Private Counter
 
 function counter() {
-  var _counter = 0
+  var counter = 0
 
   function add(num) {
-    _counter += num
+    counter += num
   }
 
   function retrieve() {
-    return _counter
+    return counter
   }
 
   return {
@@ -778,13 +843,12 @@ console.log(sum(1)(2)())
 
 `UseRef`
 
-The useRef Hook allows you to persist values between renders. UseRef does not cause the component to re-render unlike to
-useState. Also, with useRef we can directly manipulate the realDOM which is not a great practice in React.
+With useRef we can directly manipulate the realDOM. UseRef does not cause the component to rerender unlike to useState.
 
 Example
 
 ```js
-//We can calculate to how many times the component re-renders.
+//We can calculate to how many times the component rerenders.
 
 const renderCount = useRef(0)
 useEffect(() => {
@@ -806,22 +870,6 @@ const refFunc = () => {
 <button onClick = {refFunc}>Click Me</button>
 ```
 
-Example
-
-```js
-// With useRef we can get the previous value of an element.
-
-const [name, setName] = useState('');
-const prevName = useRef('');
-
-useEffect(() => {
-	prevName.current = name;
-}, [name])
-
-<input onChange = {e=> setName(e.target.value)} />
-<div>This is my {name} and this is my previous {prevName.current}</div>
-```
-
 `What is Debouncing and Throttling?`
 
 `Debouncing`
@@ -833,9 +881,9 @@ const debounceFunction = _.debounce(() => {
   // any type of code
 }, 1000)
 
-// Debounce Function Polyfill
-
 debounceFunction()
+
+// Debounce Function Polyfill
 
 const myDebounce = (cb, delay) => {
   let timer
@@ -866,24 +914,9 @@ console.log("obj= ", obj)
 // obj=  { a: 'three', b: 'two' }
 ```
 
+````
+
 Question 2
-
-```js
-const a = {}
-const b = {
-  key: "b"
-}
-const c = {
-  key: "c"
-}
-
-a[b] = 123 // {['[object Object]]': 123}
-a[c] = 456 // {'[object Object]': 456}
-
-console.log(a[b]) // Output 456
-```
-
-Question 3
 
 ```js
 const settings = {
@@ -895,9 +928,9 @@ const settings = {
 const data = JSON.stringify(settings, ["level", "health"])
 
 console.log("data= ", data) // Output data=  {"level":30,"health":20}
-```
+````
 
-Question 4
+Question 3
 
 ```js
 const user = {
@@ -917,9 +950,8 @@ const {
 
 React LifeCycle Methods
 
-React lifecycle methods are hooks that allow you to run code at specific points during a component's lifecycle. These
-methods can be used to initialize components, update components based on changes to props or state, and clean up
-resources when a component is removed from the DOM. Lifecycle methods are mainly used in class components. Here’s a
+Lifecycle methods are mainly used in class components.. These methods can be used to initialize components, update
+components based on changes to props or state, and clean up resources when a component is removed from the DOM. Here’s a
 breakdown of the key lifecycle methods:
 
 `Mounting`
@@ -954,12 +986,12 @@ componentDidMount()
 
 `Updating`
 
-These methods are called when a component is being re-rendered due to changes to props or state.
+These methods are called when a component is being rerendered due to changes to props or state.
 
 `shouldComponentUpdate(nextProps, nextState)`
 
 Called before rendering when new props or state are received. Returns true or false, determining whether the component
-should re-render.
+should rerender.
 
 ```js
 shouldComponentUpdate(nextProps, nextState)
@@ -1006,7 +1038,7 @@ Difference between LocalStorage, Session, and Cookies?
 
 `Difference between stateless and stateful architecture?`
 
-Sessions and cookies enable a `stateful architecture` by storing the session Id on the server side, either in memory,
+Session and cookies enable a `stateful architecture` by storing the session Id on the server side, either in memory,
 Redis, or a database, linked to the user's data. When a user requests with their session Id, the server checks if the
 session Id exists and retrieves the associated data. Sessions are commonly used on banking websites.
 `One of the main benefits of using sessions is that we can set them for a short interval and we can revoke the session at any time.`
@@ -1101,7 +1133,7 @@ stored value just like a normal variable.
 
 `Callback (Call me back)`
 
-A callback is a function that takes a function as an argument to the calling function.
+In callback a function is passed as an agrument to the calling function.
 
 ```js
 const firstFunction = () => {
@@ -1123,9 +1155,6 @@ function iteration(item) {
 }
 
 const numsMap = nums?.map(iteration)
-
-// what map is doing here it is calling the inner function as
-// for loop
 ```
 
 `Difference between arrow functions and normal functions?`
@@ -1146,24 +1175,13 @@ let user = {
 }
 
 user.arrowFunc() // undefined Beacause this is pointing to the window object in browser and in Node to empty object.
-user.normalFunction() // Ali Imran
+user.normalFunction() // Ali Imran Because this keyword points to the object who is calling that function
 ```
 
 `Event Bubbling`
 
 Event bubbling is a process where events trigger from the bottom to the top of the parent. Like Button -> Form -> Div if
 all of these have event triggers.
-
-`Event Capturing/ Event Trickling`
-
-It is the process where the event triggers from top to bottom. But you have to add {capture: true} inside the event
-handler function and where it is not added the default behavior will occur like first the capture events will trigger
-and then the bubbling happens.
-
-Event Delegation
-
-In event delegation, we put the event listener only on the parent tag and we identify any event that happens on child
-tags by event.target.tagName is equal to child tag.
 
 `What is This in JS?`
 
@@ -1273,35 +1291,79 @@ console.log(dummyFilter)
 map return us the new version of the previous array whereas forEach does not return anything. And as it is not returning
 an array we can not chain a new array method with it.
 
-`Function Definition/ Declaration`
+`Is JS synchronous or asynchronous?`
 
-```js
-function square(num) {
-  return num * num
-}
-```
-
-`Function Expression`
-
-```js
-const square = function (num) {
-  return num * num
-}
-```
+JS is synchrounous by default but becomes asynchronous by browser events or Node JS.
 
 `What are blocking and non-blocking I/O?`
 
-`What is JS execution context and lexical scope?`
+A blocking I/O operation is one where the program's execution is halted until the requested operation is fully
+completed.
+
+`What is JS execution context and lexical scope?` Execution context is the environment in which the code runs where as
+lexical scope means a function can access variables based on where it is written in the code, not where it is called.
+
+```js
+let x = 10
+
+function outer() {
+  let y = 20
+
+  function inner() {
+    console.log(x, y)
+  }
+
+  inner()
+}
+
+outer()
+```
+
+When the script runs, a global execution context is created where x and outer exist. When outer() is called, a new
+function execution context is created for outer, containing y and inner. Calling inner() creates another execution
+context, but when JavaScript tries to resolve x and y, it uses lexical scope, meaning it looks at where inner is written
+in the code. Since inner is defined inside outer, it can access y, and because outer is defined in the global scope,
+inner can also access x. This shows that execution contexts are created at runtime, while variable access is determined
+by the code’s lexical structure.
 
 `What is the concept of NEXT JS head?`
 
+Next JS provides a built-in component called Head from next/head. To set the meta information of each page.
+
 `How Next JS improves the SEO?`
+
+Next.js improves SEO mainly because it supports server-side rendering (SSR), static site generation (SSG), and dynamic
+meta tag management. SEO also depends on page speed.
+
+Next.js optimizes performance with:
+
+1. Automatic code splitting
+2. Image optimization (next/image)
+3. Prefetching linked pages (next/link)
+
+`CSR, SSR and SSG`
+
+`Lazy Loading and Code Splitting`
+
+Lazy loading means loading components or resources only when they are needed, reducing initial load and improving
+performance.
+
+`Why a react component render two times in development mode?` In React (v18+) development mode, components often render
+twice on initial mount because of React.StrictMode. This is intentional and only happens in development, not in
+production. React do this to test that component does not break if it render multiple times.
+
+In development mode, React will:
+
+1. Render the component two times
+2. Run useEffect
+3. Clean up the effect
+4. Run useEffect again
+
+This simulates mounting and unmounting to detect unsafe side effects.
 
 Notes
 
-1. Functions are hoisted completely. The whole definition/ declaration goes to the top of the scope.
-2. When we have a variable defined in a local scope we will not check the global scope whether it is available there.
-
+When we have a variable defined in a local scope we will not check the global scope whether it is available there.
 Example
 
 ```js
